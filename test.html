@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Jasmine Test Runner</title>
+    <link rel="shortcut icon" type="image/png" href="lib/jasmine/jasmine_favicon.png">
+    <link rel="stylesheet" type="text/css" href="specs/support/jasmine.css">
+
+    <script src="spec/support/jasmine.js"></script>
+    <script src="spec/support/jasmine-html.js"></script>
+
+    <!-- include source files here... -->
+    <script src="specs/compiled_specs.js"></script>
+
+    <!-- include spec files here... -->
+    <script src="assets/js/libs.js"></script>
+    <script src="assets/js/templates.js"></script>
+    <script src="assets/js/app.js"></script>
+  </head>
+  <body>
+    <script>
+      jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+      jasmine.getEnv().execute();
+    </script>
+  </body>
+</html>
