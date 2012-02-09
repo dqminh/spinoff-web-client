@@ -6,7 +6,7 @@ CoffeeScript = require 'coffee-script'
 UglifyParser = uglify.parser
 UglifyGen = uglify.uglify
 
-javascripts = 'app.js'; [
+javascripts =
   'assets/js/libs.js': [
     'assets/js/lib/bootstrap-alerts.js',
     'assets/js/lib/bootstrap-buttons.js',
@@ -17,7 +17,6 @@ javascripts = 'app.js'; [
     'assets/js/lib/bootstrap-tabs.js',
     'assets/js/lib/bootstrap-twipsy.js',
   ]
-]
 
 coffeescripts =
   'app.js': ['app.coffee'],
@@ -28,6 +27,7 @@ coffeescripts =
   'assets/js/specs.js': [
   ],
   'assets/js/app.js': [
+    'src/application.coffee'
   ]
 
 # minify javascripts

@@ -15,8 +15,7 @@ site.use express.favicon("./favicon.ico")
 site.get "/", (request, response) ->
   fs.createReadStream("./index.html").pipe(response);
 
-# proxying all request to `remoteServer`
-site.get "*", (request, response) ->
+process = (request, response) ->
   proxy_headers = _.clone request.headers
   proxy_headers.host = remoteServer
   proxy_options =
@@ -39,4 +38,9 @@ site.get "*", (request, response) ->
   request.addListener 'end', ->
     proxy_request.end()
 
+# proxying all request to `remoteServer`
+site.get "*", process
+site.post "*", process
+site.delete "*", process
+site.put "*", process
 site.listen(8000)
