@@ -9,9 +9,11 @@
 
     __extends(Company, _super);
 
-    Company.prototype.url = "/company";
+    function Company() {
+      Company.__super__.constructor.apply(this, arguments);
+    }
 
-    function Company() {}
+    Company.prototype.url = "/company";
 
     return Company;
 
