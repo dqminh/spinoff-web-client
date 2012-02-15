@@ -1,9 +1,10 @@
 _ = require "underscore"
 fs = require "fs"
 http = require "http"
+httpProxy = require('http-proxy')
 express = require "express"
 
-remoteServer = "spinoff-server.heroku.com"
+remoteServer = "localhost"
 
 site = express.createServer()
 
@@ -15,32 +16,13 @@ site.use express.favicon("./favicon.ico")
 site.get "/", (request, response) ->
   fs.createReadStream("./index.html").pipe(response);
 
-process = (request, response) ->
-  proxy_headers = _.clone request.headers
-  proxy_headers.host = remoteServer
-  proxy_options =
-    host: remoteServer
-    port: 80
-    headers: proxy_headers
-    path: request.path
-    method: request.method
-
-  proxy_request = http.request proxy_options, (proxy_response) ->
-    proxy_response.addListener 'data', (chunk) ->
-      response.write chunk, 'binary'
-    proxy_response.addListener 'end', ->
-      response.end()
-    response.writeHead proxy_response.statusCode, proxy_response.headers
-
-  request.addListener 'data', (chunk) ->
-    proxy_request.write chunk, 'binary'
-
-  request.addListener 'end', ->
-    proxy_request.end()
+proxy = new httpProxy.HttpProxy(
+	target: 
+    host: remoteServer,
+    port: 4567)
 
 # proxying all request to `remoteServer`
-site.get "*", process
-site.post "*", process
-site.delete "*", process
-site.put "*", process
+site.all "*", (request, response) ->
+  proxy.proxyRequest request, response
+
 site.listen(8000)

@@ -1,5 +1,5 @@
 (function() {
-  var express, fs, http, process, remoteServer, site, _;
+  var express, fs, http, httpProxy, proxy, remoteServer, site, _;
 
   _ = require("underscore");
 
@@ -7,9 +7,11 @@
 
   http = require("http");
 
+  httpProxy = require('http-proxy');
+
   express = require("express");
 
-  remoteServer = "spinoff-server.heroku.com";
+  remoteServer = "localhost";
 
   site = express.createServer();
 
@@ -23,41 +25,16 @@
     return fs.createReadStream("./index.html").pipe(response);
   });
 
-  process = function(request, response) {
-    var proxy_headers, proxy_options, proxy_request;
-    proxy_headers = _.clone(request.headers);
-    proxy_headers.host = remoteServer;
-    proxy_options = {
+  proxy = new httpProxy.HttpProxy({
+    target: {
       host: remoteServer,
-      port: 80,
-      headers: proxy_headers,
-      path: request.path,
-      method: request.method
-    };
-    proxy_request = http.request(proxy_options, function(proxy_response) {
-      proxy_response.addListener('data', function(chunk) {
-        return response.write(chunk, 'binary');
-      });
-      proxy_response.addListener('end', function() {
-        return response.end();
-      });
-      return response.writeHead(proxy_response.statusCode, proxy_response.headers);
-    });
-    request.addListener('data', function(chunk) {
-      return proxy_request.write(chunk, 'binary');
-    });
-    return request.addListener('end', function() {
-      return proxy_request.end();
-    });
-  };
+      port: 4567
+    }
+  });
 
-  site.get("*", process);
-
-  site.post("*", process);
-
-  site["delete"]("*", process);
-
-  site.put("*", process);
+  site.all("*", function(request, response) {
+    return proxy.proxyRequest(request, response);
+  });
 
   site.listen(8000);
 
